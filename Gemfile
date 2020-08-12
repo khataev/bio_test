@@ -22,6 +22,8 @@ gem 'bootsnap', '>= 1.4.2', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+gem 'config'
+gem 'dotenv-rails', require: 'dotenv/rails-now'
 gem 'trailblazer-rails'
 
 # API
@@ -29,6 +31,8 @@ gem 'grape'
 gem 'grape-entity'
 gem 'jwt'
 gem 'oj'
+# HINT: latest knock compatible with zeitwerk
+gem 'knock', github: 'nsarno/knock'
 
 group :development, :test do
   gem 'factory_bot_rails'

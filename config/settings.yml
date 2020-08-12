@@ -1,0 +1,2 @@
+knock:
+  token_secret_signature_key: <%= ENV.fetch('KNOCK_TOKEN_SECRET_SIGNATURE_KEY') %>
