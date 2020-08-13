@@ -25,7 +25,7 @@ module V1
 
         desc 'Получить информацию о клиенте'
         get do
-          present @client, with: Entities::Client
+          present @client, with: Entities::Client, embed: params['embed']
         end
       end
     end

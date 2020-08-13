@@ -20,6 +20,34 @@ RSpec.describe V1::Clients do
       expect(last_response.status).to eq 200
       expect(parsed_body[:name]).to eq client.name
     end
+
+    context 'when embed' do
+      let(:base_url) { "/api/v1/clients/#{client.id}?embed=projects" }
+      let(:project) { create :project, client: client }
+      let(:expected_body) do
+        hash_including(
+          id: client.id,
+          name: client.name,
+          projects: array_including(
+            hash_including(
+              id: project.id,
+              name: project.name,
+              created_at: kind_of(String)
+            )
+          )
+        )
+      end
+
+      before do
+        project
+      end
+
+      it 'embeds projects' do
+        get base_url
+        expect(last_response.status).to eq 200
+        expect(parsed_body).to match expected_body
+      end
+    end
   end
 
   describe 'POST /api/v1/clients' do

@@ -5,5 +5,6 @@ module Entities
     expose :id
     expose :name
     expose :created_at
+    expose :projects, with: Entities::Project, if: ->(_, options) { options[:embed] == 'projects' }
   end
 end
