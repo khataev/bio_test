@@ -36,6 +36,10 @@ Metrics/BlockLength:
 Style/AsciiComments:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'app/concepts/**/*'
+
 Style/Documentation:
   Enabled: false
 

@@ -10,17 +10,14 @@ module V1
         use :create_project_params
       end
       post do
-        # TODO(khataev): to TB operation
-        project_params = declared(params, include_missing: false)
-        client_params = project_params.delete('client')
-        client = client_params ? Client.create(client_params) : nil
-        project_params = project_params.merge('client_id' => client.id) if client
+        result = Project::Operations::Create.call(
+          params: declared(params, include_missing: false)
+        )
 
-        project = Project.create project_params
-        if project.persisted?
-          present project, with: Entities::Project
+        if result.success?
+          present result[:result], with: Entities::Project
         else
-          unprocessable_entity_validation_errors(project)
+          unprocessable_entity_validation_errors(result[:result])
         end
       end
 

@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+module Project::Operations
+  class Create < Trailblazer::Operation
+    pass :setup_client_params, Output(:failure) => Id(:create_project)
+    step :create_client
+    step :create_project
+
+    def setup_client_params(ctx, params:, **)
+      ctx[:client_params] = params.delete(:client)
+    end
+
+    def create_client(ctx, params:, client_params:, **)
+      client = Client.create(client_params)
+      ctx[:params] = params.merge(client_id: client.id)
+    end
+
+    def create_project(ctx, params:, **)
+      ctx[:result] = Project.create(params)
+    end
+  end
+end
