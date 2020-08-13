@@ -75,20 +75,36 @@ RSpec.describe V1::Projects do
       project.as_json.merge(client: client.as_json)
     end
 
-    it 'creates project' do
+    before do
       client.save!
       project.client_id = client.id
-      post base_url, project.as_json
-      expect(last_response.status).to eq 201
-      expect(parsed_body).to match expected_body
     end
 
-    it 'creates project and client simultaneously' do
-      post base_url, project_with_client
-      expect(last_response.status).to eq 201
-      expect(parsed_body[:name]).to eq project.name
-      expect(created_project.name).to eq project.name
-      expect(created_client.name).to eq client.name
+    context 'when success' do
+      it 'creates project' do
+        post base_url, project.as_json
+        expect(last_response.status).to eq 201
+        expect(parsed_body).to match expected_body
+      end
+
+      it 'creates project and client simultaneously' do
+        post base_url, project_with_client
+        expect(last_response.status).to eq 201
+        expect(parsed_body[:name]).to eq project.name
+        expect(created_project.name).to eq project.name
+        expect(created_client.name).to eq client.name
+      end
+    end
+
+    context 'when error' do
+      let(:expected_data) { ["Name can't be blank"] }
+
+      it 'return error' do
+        project.name = nil
+        post base_url, project.as_json
+        expect(last_response.status).to eq 422
+        expect(parsed_body.dig(:error, :data)).to eq expected_data
+      end
     end
   end
 end

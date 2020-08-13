@@ -17,7 +17,7 @@ module V1
         if result.success?
           present result[:result], with: Entities::Project
         else
-          unprocessable_entity_validation_errors(result[:result])
+          unprocessable_entity_message(result[:result])
         end
       end
 

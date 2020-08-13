@@ -25,19 +25,16 @@ module ErrorHelper
     )
   end
 
-  def unprocessable_entity_message(*messages)
+  def unprocessable_entity_message(messages)
     error!(
       {
         error: {
+          # TODO(khataev): нах нам дублирование кода?
           code: code(:unprocessable_entity),
           data: messages
         }
       }, code(:unprocessable_entity)
     )
-  end
-
-  def unprocessable_entity_validation_errors(entity)
-    unprocessable_entity_message(entity.errors.full_messages)
   end
 
   private
