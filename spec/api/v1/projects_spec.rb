@@ -36,6 +36,9 @@ RSpec.describe V1::Projects do
     let(:project) { build :project }
     let(:created_client) { Client.first }
     let(:created_project) { Project.first }
+    let(:project_with_client) do
+      project.as_json.merge(client: client.as_json)
+    end
 
     it 'creates project' do
       client.save!
@@ -43,6 +46,14 @@ RSpec.describe V1::Projects do
       post base_url, project.as_json
       expect(last_response.status).to eq 201
       expect(parsed_body).to match expected_body
+    end
+
+    it 'creates project and client simultaneously' do
+      post base_url, project_with_client
+      expect(last_response.status).to eq 201
+      expect(parsed_body[:name]).to eq project.name
+      expect(created_project.name).to eq project.name
+      expect(created_client.name).to eq client.name
     end
   end
 end

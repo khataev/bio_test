@@ -2,10 +2,12 @@
 
 module V1
   class Clients < Grape::API
+    helpers ParamsHelper
+
     resources :clients do
       desc 'Создать клиента'
       params do
-        requires :name
+        use :client_params
       end
       post do
         client = Client.create declared(params)

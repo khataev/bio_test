@@ -2,14 +2,21 @@
 
 module V1
   class Projects < Grape::API
+    helpers ParamsHelper
+
     resources :projects do
       desc 'Создать проект'
       params do
-        requires :client_id
-        requires :name
+        use :project_params
       end
       post do
-        project = Project.create declared(params)
+        # TODO(khataev): to TB operation
+        project_params = declared(params, include_missing: false)
+        client_params = project_params.delete('client')
+        client = client_params ? Client.create(client_params) : nil
+        project_params = project_params.merge('client_id' => client.id) if client
+
+        project = Project.create project_params
         if project.persisted?
           present project, with: Entities::Project
         else
