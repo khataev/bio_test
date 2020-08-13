@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :project do
     sequence(:name) { |n| "Name#{n}" }
-    status { :new }
+    status { :created }
     client { nil }
   end
 end

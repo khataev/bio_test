@@ -7,5 +7,6 @@ module V1
     format :json
 
     mount V1::Clients
+    mount V1::Projects
   end
 end
