@@ -25,10 +25,31 @@ RSpec.describe V1::Projects do
     describe 'GET /api/v1/projects/:project_id' do
       let(:created_project) { Project.first }
 
-      it 'gets client' do
+      it 'gets project' do
         get base_url
         expect(last_response.status).to eq 200
         expect(parsed_body).to match expected_body
+      end
+
+      context 'when embed' do
+        let(:base_url) { "/api/v1/projects/#{project.id}?embed=client" }
+        let(:expected_body) do
+          hash_including(
+            id: project.id,
+            name: project.name,
+            client: hash_including(
+              id: client.id,
+              name: client.name,
+              created_at: kind_of(String)
+            )
+          )
+        end
+
+        it 'embeds client' do
+          get base_url
+          expect(last_response.status).to eq 200
+          expect(parsed_body).to match expected_body
+        end
       end
     end
 

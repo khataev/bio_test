@@ -28,7 +28,7 @@ module V1
 
         desc 'Получить информацию о проекте'
         get do
-          present @project, with: Entities::Project
+          present @project, with: Entities::Project, embed: params['embed']
         end
 
         desc 'Обновить информацию о проекте'
