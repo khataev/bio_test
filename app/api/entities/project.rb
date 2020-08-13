@@ -5,5 +5,7 @@ module Entities
     # TODO(khataev): без документации?
     expose :client_id
     expose :name
+    expose :status
+    expose :created_at
   end
 end

@@ -7,7 +7,7 @@ module V1
     resources :projects do
       desc 'Создать проект'
       params do
-        use :project_params
+        use :create_project_params
       end
       post do
         # TODO(khataev): to TB operation
@@ -32,6 +32,22 @@ module V1
         desc 'Получить информацию о проекте'
         get do
           present @project, with: Entities::Project
+        end
+
+        desc 'Обновить информацию о проекте'
+        params do
+          use :update_project_params
+        end
+        patch do
+          project_params = declared(params, include_missing: false).except('project_id')
+          @project.update!(project_params)
+          present @project, with: Entities::Project
+        end
+
+        desc 'Удалить проект проект'
+        delete do
+          @project.destroy!
+          status 200
         end
       end
     end

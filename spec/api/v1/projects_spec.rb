@@ -17,16 +17,51 @@ RSpec.describe V1::Projects do
   end
   let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
 
-  describe 'GET /api/v1/projects/:project_id' do
+  describe '/api/v1/projects/:project_id' do
     let(:base_url) { "/api/v1/projects/#{project.id}" }
     let(:client) { create :client }
     let(:project) { create :project, client: client }
-    let(:created_project) { Project.first }
 
-    it 'gets client' do
-      get base_url
-      expect(last_response.status).to eq 200
-      expect(parsed_body).to match expected_body
+    describe 'GET /api/v1/projects/:project_id' do
+      let(:created_project) { Project.first }
+
+      it 'gets client' do
+        get base_url
+        expect(last_response.status).to eq 200
+        expect(parsed_body).to match expected_body
+      end
+    end
+
+    describe 'PATCH /api/v1/projects/:project_id' do
+      let(:new_client) { create :client }
+      let(:new_project_params) do
+        project_params = project.as_json
+        project_params['client_id'] = new_client.id
+        project_params['name'] = 'new project name'
+        project_params['status'] = 'closed'
+        project_params
+      end
+      let(:expected_project_params) do
+        hash_including(
+          client_id: new_client.id,
+          name: 'new project name',
+          status: 'closed'
+        )
+      end
+
+      it 'updates project' do
+        patch base_url, new_project_params
+        expect(last_response.status).to eq 200
+        expect(parsed_body).to match expected_project_params
+      end
+    end
+
+    describe 'DELETE /api/v1/projects/:project_id' do
+      it 'deletes project' do
+        delete base_url
+        expect(last_response.status).to eq 200
+        expect { project.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 
