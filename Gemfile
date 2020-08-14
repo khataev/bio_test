@@ -34,6 +34,10 @@ gem 'oj'
 # HINT: latest knock compatible with zeitwerk
 gem 'knock', github: 'nsarno/knock'
 
+# Pagination
+gem 'api-pagination'
+gem 'pagy'
+
 group :development, :test do
   gem 'factory_bot_rails'
   gem 'pry-byebug'

@@ -86,45 +86,67 @@ RSpec.describe V1::Projects do
     end
   end
 
-  describe 'POST /api/v1/projects' do
+  describe '/api/v1/projects' do
     let(:base_url) { '/api/v1/projects' }
     let(:client) { build :client }
-    let(:project) { build :project }
-    let(:created_client) { Client.first }
-    let(:created_project) { Project.first }
-    let(:project_with_client) do
-      project.as_json.merge(client: client.as_json)
-    end
 
-    before do
-      client.save!
-      project.client_id = client.id
-    end
 
-    context 'when success' do
-      it 'creates project' do
-        post base_url, project.as_json
-        expect(last_response.status).to eq 201
-        expect(parsed_body).to match expected_body
+    describe 'GET /api/v1/projects' do
+      before do
+        create_list :project, 2, client: client
       end
 
-      it 'creates project and client simultaneously' do
-        post base_url, project_with_client
-        expect(last_response.status).to eq 201
-        expect(parsed_body[:name]).to eq project.name
-        expect(created_project.name).to eq project.name
-        expect(created_client.name).to eq client.name
+      it 'returns all projects by default' do
+        get base_url
+        expect(last_response.status).to eq 200
+        expect(parsed_body.count).to eq 2
+      end
+
+      it 'returns requested page' do
+        get "#{base_url}/?page=1&per_page=1"
+        expect(last_response.status).to eq 200
+        expect(parsed_body.count).to eq 1
       end
     end
 
-    context 'when error' do
-      let(:expected_data) { ["Name can't be blank"] }
+    describe 'POST /api/v1/projects' do
+      let(:project) { build :project }
+      let(:created_client) { Client.first }
+      let(:created_project) { Project.first }
+      let(:project_with_client) do
+        project.as_json.merge(client: client.as_json)
+      end
 
-      it 'return error' do
-        project.name = nil
-        post base_url, project.as_json
-        expect(last_response.status).to eq 422
-        expect(parsed_body.dig(:error, :data)).to eq expected_data
+      before do
+        client.save!
+        project.client_id = client.id
+      end
+
+      context 'when success' do
+        it 'creates project' do
+          post base_url, project.as_json
+          expect(last_response.status).to eq 201
+          expect(parsed_body).to match expected_body
+        end
+
+        it 'creates project and client simultaneously' do
+          post base_url, project_with_client
+          expect(last_response.status).to eq 201
+          expect(parsed_body[:name]).to eq project.name
+          expect(created_project.name).to eq project.name
+          expect(created_client.name).to eq client.name
+        end
+      end
+
+      context 'when error' do
+        let(:expected_data) { ["Name can't be blank"] }
+
+        it 'return error' do
+          project.name = nil
+          post base_url, project.as_json
+          expect(last_response.status).to eq 422
+          expect(parsed_body.dig(:error, :data)).to eq expected_data
+        end
       end
     end
   end

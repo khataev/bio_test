@@ -5,6 +5,12 @@ module V1
     helpers ParamsHelper
 
     resources :projects do
+      desc 'Получить список клиентов'
+      paginate
+      get do
+        present paginate(Project.all), with: Entities::Project
+      end
+
       desc 'Создать проект'
       params do
         use :create_project_params
