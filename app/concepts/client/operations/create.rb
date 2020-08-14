@@ -2,11 +2,14 @@
 
 module Client::Operations
   class Create < Trailblazer::Operation
+    # rubocop:disable Lint/UnreachableCode
     pass :setup_projects_params
-    step :create_client, Output(:failure) => Id(:prepare_client_errors)
+    step :create_client
+    fail :prepare_client_errors
+
     pass :create_projects
     step :prepare_result, pass_fast: true
-    step :prepare_client_errors
+    # rubocop:enable Lint/UnreachableCode
 
     def setup_projects_params(ctx, params:, **)
       ctx[:projects_params] = params.delete(:projects) || []

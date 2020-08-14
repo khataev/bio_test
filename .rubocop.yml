@@ -64,6 +64,10 @@ Style/RedundantRegexpEscape:
 Style/SlicingWithRange:
   Enabled: true
 
+Style/SignalException:
+  Exclude:
+    - 'app/concepts/**/*'
+
 Rails:
   Enabled: true
 

@@ -77,7 +77,14 @@ RSpec.describe V1::Clients do
     end
 
     context 'when error' do
+      let(:expected_data) { ["Name can't be blank"] }
 
+      it 'return error' do
+        client.name = nil
+        post base_url, client.as_json
+        expect(last_response.status).to eq 422
+        expect(parsed_body.dig(:error, :data)).to eq expected_data
+      end
     end
   end
 end
