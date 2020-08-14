@@ -9,11 +9,12 @@ RSpec.describe V1::Clients do
     OUTER_APP
   end
 
+  let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
+
   describe 'GET /api/v1/clients/:client_id' do
     let(:base_url) { "/api/v1/clients/#{client.id}" }
     let(:client) { create :client }
     let(:created_client) { Client.first }
-    let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
 
     it 'gets client' do
       get base_url
@@ -53,12 +54,30 @@ RSpec.describe V1::Clients do
   describe 'POST /api/v1/clients' do
     let(:base_url) { '/api/v1/clients' }
     let(:client) { build :client }
+    let(:projects) { build_list :project, 2 }
     let(:created_client) { Client.first }
+    let(:client_with_projects) do
+      client.as_json.merge(projects: projects.as_json)
+    end
 
-    it 'creates client' do
-      post base_url, client.as_json
-      expect(last_response.status).to eq 201
-      expect(created_client.name).to eq client.name
+    context 'when success' do
+      it 'creates client' do
+        post base_url, client.as_json
+        expect(last_response.status).to eq 201
+        expect(created_client.name).to eq client.name
+      end
+
+      it 'creates client and projects simultaneously' do
+        post base_url, client_with_projects
+        expect(last_response.status).to eq 201
+        expect(parsed_body[:name]).to eq client.name
+        expect(created_client.name).to eq client.name
+        expect(created_client.projects.count).to eq 2
+      end
+    end
+
+    context 'when error' do
+
     end
   end
 end

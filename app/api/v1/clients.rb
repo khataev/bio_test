@@ -7,14 +7,17 @@ module V1
     resources :clients do
       desc 'Создать клиента'
       params do
-        use :client_params
+        use :create_client_params
       end
       post do
-        client = Client.create declared(params)
-        if client.persisted?
-          present client, with: Entities::Client
+        result = Client::Operations::Create.call(
+          params: declared(params, include_missing: false)
+        )
+
+        if result.success?
+          present result[:result], with: Entities::Client
         else
-          unprocessable_entity_validation_errors(client)
+          unprocessable_entity_message(result[:result])
         end
       end
 
