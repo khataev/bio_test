@@ -91,7 +91,6 @@ RSpec.describe V1::Projects do
     let(:client) { create :client }
 
     describe 'GET /api/v1/projects' do
-
       context 'with pagination' do
         before do
           create_list :project, 2, client: client
