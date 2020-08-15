@@ -25,30 +25,41 @@ RSpec.describe V1::Projects do
     describe 'GET /api/v1/projects/:project_id' do
       let(:created_project) { Project.first }
 
-      it 'gets project' do
-        get base_url
-        expect(last_response.status).to eq 200
-        expect(parsed_body).to match expected_body
-      end
+      context 'when authenticated' do
+        include_context 'when authenticated'
 
-      context 'when embed' do
-        let(:base_url) { "/api/v1/projects/#{project.id}?embed=client" }
-        let(:expected_body) do
-          hash_including(
-            id: project.id,
-            name: project.name,
-            client: hash_including(
-              id: client.id,
-              name: client.name,
-              created_at: kind_of(String)
-            )
-          )
-        end
-
-        it 'embeds client' do
+        it 'gets project' do
           get base_url
           expect(last_response.status).to eq 200
           expect(parsed_body).to match expected_body
+        end
+
+        context 'when embed' do
+          let(:base_url) { "/api/v1/projects/#{project.id}?embed=client" }
+          let(:expected_body) do
+            hash_including(
+              id: project.id,
+              name: project.name,
+              client: hash_including(
+                id: client.id,
+                name: client.name,
+                created_at: kind_of(String)
+              )
+            )
+          end
+
+          it 'embeds client' do
+            get base_url
+            expect(last_response.status).to eq 200
+            expect(parsed_body).to match expected_body
+          end
+        end
+      end
+
+      context 'when unauthenticated' do
+        it 'gets 401' do
+          get base_url
+          expect(last_response.status).to eq 401
         end
       end
     end
@@ -70,18 +81,41 @@ RSpec.describe V1::Projects do
         )
       end
 
-      it 'updates project' do
-        patch base_url, new_project_params
-        expect(last_response.status).to eq 200
-        expect(parsed_body).to match expected_project_params
+
+      context 'when authenticated' do
+        include_context 'when authenticated'
+
+        it 'updates project' do
+          patch base_url, new_project_params
+          expect(last_response.status).to eq 200
+          expect(parsed_body).to match expected_project_params
+        end
+      end
+
+      context 'when unauthenticated' do
+        it 'gets 401' do
+          patch base_url, new_project_params
+          expect(last_response.status).to eq 401
+        end
       end
     end
 
     describe 'DELETE /api/v1/projects/:project_id' do
-      it 'deletes project' do
-        delete base_url
-        expect(last_response.status).to eq 200
-        expect { project.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      context 'when authenticated' do
+        include_context 'when authenticated'
+
+        it 'deletes project' do
+          delete base_url
+          expect(last_response.status).to eq 200
+          expect { project.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+
+      context 'when unauthenticated' do
+        it 'gets 401' do
+          delete base_url
+          expect(last_response.status).to eq 401
+        end
       end
     end
   end
@@ -91,96 +125,107 @@ RSpec.describe V1::Projects do
     let(:client) { create :client }
 
     describe 'GET /api/v1/projects' do
-      context 'with pagination' do
-        before do
-          create_list :project, 2, client: client
+      context 'when authenticated' do
+        include_context 'when authenticated'
+
+        context 'with pagination' do
+          before do
+            create_list :project, 2, client: client
+          end
+
+          it 'returns all projects by default' do
+            get base_url
+            expect(last_response.status).to eq 200
+            expect(parsed_body.count).to eq 2
+          end
+
+          it 'returns requested page' do
+            get "#{base_url}/?page=1&per_page=1"
+            expect(last_response.status).to eq 200
+            expect(parsed_body.count).to eq 1
+          end
         end
 
-        it 'returns all projects by default' do
-          get base_url
-          expect(last_response.status).to eq 200
-          expect(parsed_body.count).to eq 2
-        end
+        context 'with filtering' do
+          let(:client1) { create :client }
+          let(:project1) do
+            create :project,
+                   client: client,
+                   status: :created,
+                   created_at: Time.zone.local(2020, 8, 1)
+          end
+          let(:project2) do
+            create :project,
+                   client: client1,
+                   status: :in_progress,
+                   created_at: Time.zone.local(2020, 8, 2)
+          end
+          let(:project3) do
+            create :project,
+                   client: client,
+                   status: :closed,
+                   created_at: Time.zone.local(2020, 8, 3),
+                   name: 'qwerty'
+          end
+          let(:project4) do
+            create :project,
+                   client: client1,
+                   status: :closed,
+                   created_at: Time.zone.local(2020, 8, 3),
+                   name: 'rtyuiop'
+          end
+          let(:project5) do
+            create :project,
+                   client: client1,
+                   status: :closed,
+                   created_at: Time.zone.local(2020, 8, 4)
+          end
+          let(:from) { Time.zone.local(2020, 8, 2, 10) }
+          let(:to) { from + 1.day }
+          let(:query) do
+            {
+              query: {
+                name_cont: 'rty',
+                client_ids: [client1.id],
+                statuses: %i[in_progress closed],
+                created_at_from: from.iso8601,
+                created_at_to: to.iso8601
+              }
+            }
+          end
+          let(:url) do
+            Addressable::Template.new("#{base_url}/{?query*}").expand(query).to_s
+          end
+          let(:expected_result) do
+            [
+              hash_including(
+                id: project4.id,
+                name: project4.name,
+                status: project4.status
+              )
+            ]
+          end
 
-        it 'returns requested page' do
-          get "#{base_url}/?page=1&per_page=1"
-          expect(last_response.status).to eq 200
-          expect(parsed_body.count).to eq 1
+          before do
+            project1
+            project2
+            project3
+            project4
+            project5
+          end
+
+          it 'filters by client_id, status, created_at' do
+            get url
+            expect(last_response.status).to eq 200
+            expect(parsed_body).to match expected_result
+          end
         end
       end
 
-      context 'with filtering' do
-        let(:client1) { create :client }
-        let(:project1) do
-          create :project,
-                 client: client,
-                 status: :created,
-                 created_at: Time.zone.local(2020, 8, 1)
-        end
-        let(:project2) do
-          create :project,
-                 client: client1,
-                 status: :in_progress,
-                 created_at: Time.zone.local(2020, 8, 2)
-        end
-        let(:project3) do
-          create :project,
-                 client: client,
-                 status: :closed,
-                 created_at: Time.zone.local(2020, 8, 3),
-                 name: 'qwerty'
-        end
-        let(:project4) do
-          create :project,
-                 client: client1,
-                 status: :closed,
-                 created_at: Time.zone.local(2020, 8, 3),
-                 name: 'rtyuiop'
-        end
-        let(:project5) do
-          create :project,
-                 client: client1,
-                 status: :closed,
-                 created_at: Time.zone.local(2020, 8, 4)
-        end
-        let(:from) { Time.zone.local(2020, 8, 2, 10) }
-        let(:to) { from + 1.day }
-        let(:query) do
-          {
-            query: {
-              name_cont: 'rty',
-              client_ids: [client1.id],
-              statuses: %i[in_progress closed],
-              created_at_from: from.iso8601,
-              created_at_to: to.iso8601
-            }
-          }
-        end
-        let(:url) do
-          Addressable::Template.new("#{base_url}/{?query*}").expand(query).to_s
-        end
-        let(:expected_result) do
-          [
-            hash_including(
-              id: project4.id,
-              name: project4.name,
-              status: project4.status
-            )
-          ]
-        end
-
-        before do
-          project1
-          project2
-          project3
-          project4
-          project5
-        end
-
-        it 'filters by client_id, status, created_at' do
-          get url
-          expect(last_response.status).to eq 200
-          expect(parsed_body).to match expected_result
+      context 'when unauthenticated' do
+        it 'gets 401' do
+          get base_url
+          expect(last_response.status).to eq 401
         end
       end
     end
@@ -198,30 +243,41 @@ RSpec.describe V1::Projects do
         project.client_id = client.id
       end
 
-      context 'when success' do
-        it 'creates project' do
-          post base_url, project.as_json
-          expect(last_response.status).to eq 201
-          expect(parsed_body).to match expected_body
+      context 'when authenticated' do
+        include_context 'when authenticated'
+
+        context 'when success' do
+          it 'creates project' do
+            post base_url, project.as_json
+            expect(last_response.status).to eq 201
+            expect(parsed_body).to match expected_body
+          end
+
+          it 'creates project and client simultaneously' do
+            post base_url, project_with_client
+            expect(last_response.status).to eq 201
+            expect(parsed_body[:name]).to eq project.name
+            expect(created_project.name).to eq project.name
+            expect(created_client.name).to eq client.name
+          end
         end
 
-        it 'creates project and client simultaneously' do
-          post base_url, project_with_client
-          expect(last_response.status).to eq 201
-          expect(parsed_body[:name]).to eq project.name
-          expect(created_project.name).to eq project.name
-          expect(created_client.name).to eq client.name
+        context 'when error' do
+          let(:expected_data) { ["Name can't be blank"] }
+
+          it 'return error' do
+            project.name = nil
+            post base_url, project.as_json
+            expect(last_response.status).to eq 422
+            expect(parsed_body.dig(:error, :data)).to eq expected_data
+          end
         end
       end
 
-      context 'when error' do
-        let(:expected_data) { ["Name can't be blank"] }
-
-        it 'return error' do
-          project.name = nil
+      context 'when unauthenticated' do
+        it 'gets 401' do
           post base_url, project.as_json
-          expect(last_response.status).to eq 422
-          expect(parsed_body.dig(:error, :data)).to eq expected_data
+          expect(last_response.status).to eq 401
         end
       end
     end
