@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# TODO(khataev): remove Operations namespace
 module Resource
+  # TODO(khataev): Client to plural
   module Client
     class Create < Trailblazer::Operation
       # rubocop:disable Lint/UnreachableCode

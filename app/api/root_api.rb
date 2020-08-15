@@ -10,9 +10,9 @@ class RootApi < Grape::API
     not_found(e)
   end
 
-  # rescue_from Grape::Knock::ForbiddenError do |_e|
-  #   unauthorized
-  # end
+  rescue_from Errors::Unauthorized do
+    unauthorized
+  end
 
   mount V1::Root
 end

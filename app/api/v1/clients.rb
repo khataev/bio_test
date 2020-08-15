@@ -2,7 +2,7 @@
 
 module V1
   class Clients < Grape::API
-    helpers ParamsHelper
+    helpers ParamsHelper, CookiesHelper
 
     resources :clients do
       desc 'Создать клиента'
@@ -10,6 +10,9 @@ module V1
         use :create_client_params
       end
       post do
+        auth = Api::User::Authenticate.call(token: jwt_token)
+        raise Errors::Unauthorized if auth.failure?
+
         result = Resource::Client::Create.call(
           params: declared(params, include_missing: false)
         )
@@ -28,6 +31,9 @@ module V1
 
         desc 'Получить информацию о клиенте'
         get do
+          auth = Api::User::Authenticate.call(token: jwt_token)
+          raise Errors::Unauthorized if auth.failure?
+
           present @client, with: Entities::Client, embed: params['embed']
         end
       end
