@@ -228,6 +228,24 @@ RSpec.describe V1::Projects do
           expect(last_response.status).to eq 401
         end
       end
+
+      context 'with resource authorization' do
+        let(:user1) { create :user }
+        let(:user2) { create :user }
+
+        include_context 'with authorization' do
+          let(:super_user) { user1 }
+          let(:user) { user2 }
+        end
+
+        before do
+          create_list :project, 2, client: client
+        end
+
+        it 'has access to all projects' do
+
+        end
+      end
     end
 
     describe 'POST /api/v1/projects' do

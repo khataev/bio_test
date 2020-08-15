@@ -25,6 +25,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'bcrypt'
 gem 'config'
 gem 'dotenv-rails', require: 'dotenv/rails-now'
+gem 'httparty'
 gem 'trailblazer-rails'
 
 # API

@@ -161,6 +161,9 @@ GEM
       multi_json (>= 1.3.2)
     hashdiff (1.0.1)
     hirb (0.7.3)
+    httparty (0.18.1)
+      mime-types (~> 3.0)
+      multi_xml (>= 0.5.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     jwt (2.2.1)
@@ -175,12 +178,16 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (1.0.0)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2020.0512)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.1)
     msgpack (1.3.3)
     multi_json (1.15.0)
+    multi_xml (0.6.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     mustermann-grape (1.0.1)
@@ -361,6 +368,7 @@ DEPENDENCIES
   factory_bot_rails
   grape
   grape-entity
+  httparty
   jwt
   knock!
   listen

@@ -1,2 +1,4 @@
+hosts:
+  authorize_resource: <%= ENV.fetch('HOSTS_AUTHORIZE_RESOURCE') %>
 knock:
   token_secret_signature_key: <%= ENV.fetch('KNOCK_TOKEN_SECRET_SIGNATURE_KEY') %>
