@@ -11,7 +11,7 @@ module V1
       end
       paginate
       get do
-        result = Project::Query::Search.call(params: declared(params))
+        result = Resource::Project::Query::Search.call(params: declared(params))
         present paginate(result[:scope]), with: Entities::Project
       end
 
@@ -20,7 +20,7 @@ module V1
         use :create_project_params
       end
       post do
-        result = Project::Operations::Create.call(
+        result = Resource::Project::Create.call(
           params: declared(params, include_missing: false)
         )
 
@@ -33,7 +33,7 @@ module V1
 
       route_param :project_id, type: String do
         before do
-          @project = Project.find(params[:project_id])
+          @project = ::Project.find(params[:project_id])
         end
 
         desc 'Получить информацию о проекте'

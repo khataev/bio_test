@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Query::ByClientIds do
+RSpec.describe Resource::Project::Query::ByClientIds do
   let(:client1) { create :client }
   let(:client2) { create :client }
   let(:client3) { create :client }

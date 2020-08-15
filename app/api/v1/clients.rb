@@ -10,7 +10,7 @@ module V1
         use :create_client_params
       end
       post do
-        result = Client::Operations::Create.call(
+        result = Resource::Client::Create.call(
           params: declared(params, include_missing: false)
         )
 
@@ -23,7 +23,7 @@ module V1
 
       route_param :client_id, type: String do
         before do
-          @client = Client.find(params[:client_id])
+          @client = ::Client.find(params[:client_id])
         end
 
         desc 'Получить информацию о клиенте'

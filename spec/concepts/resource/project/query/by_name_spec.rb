@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Query::ByName do
+RSpec.describe Resource::Project::Query::ByName do
   let(:client1) { create :client }
   let(:project1) { create :project, client: client1, name: 'QwertY' }
   let(:project2) { create :project, client: client1, name: 'WertyU' }

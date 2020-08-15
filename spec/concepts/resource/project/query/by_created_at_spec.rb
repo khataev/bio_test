@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Query::ByCreatedAt do
+RSpec.describe Resource::Project::Query::ByCreatedAt do
   let(:client1) { create :client }
   let(:time) { Time.zone.local(2020, 8, 1) }
   let(:project1) { create :project, client: client1, created_at: time }

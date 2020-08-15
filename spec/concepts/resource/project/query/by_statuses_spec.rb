@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Query::ByStatuses do
+RSpec.describe Resource::Project::Query::ByStatuses do
   let(:client1) { create :client }
   let(:project1) { create :project, client: client1, status: :created }
   let(:project2) { create :project, client: client1, status: :in_progress }
