@@ -35,4 +35,12 @@ module ParamsHelper
     end
     use :raw_project_params
   end
+
+  params :search_params do
+    optional :name_cont, type: String, desc: 'Поиск по имени'
+    optional :client_ids, type: Array, coerce_with: JSON, desc: 'ИД клиентов'
+    optional :states, type: Array, coerce_with: JSON, desc: 'Статусы проекта'
+    optional :created_at_from, type: String, desc: 'От текущего времени'
+    optional :created_at_to, type: String, desc: 'До текущего времени'
+  end
 end

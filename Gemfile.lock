@@ -351,6 +351,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable
   annotate
   api-pagination
   bootsnap (>= 1.4.2)

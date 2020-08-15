@@ -6,9 +6,13 @@ module V1
 
     resources :projects do
       desc 'Получить список клиентов'
+      params do
+        use :search_params
+      end
       paginate
       get do
-        present paginate(Project.all), with: Entities::Project
+        result = Project::Query::Search.call(params: declared(params))
+        present paginate(result[:scope]), with: Entities::Project
       end
 
       desc 'Создать проект'

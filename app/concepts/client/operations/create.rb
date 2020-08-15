@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO(khataev): remove Operations namespace
 module Client::Operations
   class Create < Trailblazer::Operation
     # rubocop:disable Lint/UnreachableCode

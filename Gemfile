@@ -56,6 +56,7 @@ group :development do
 end
 
 group :test do
+  gem 'addressable'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'webmock'
 end
