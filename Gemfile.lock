@@ -354,6 +354,7 @@ DEPENDENCIES
   addressable
   annotate
   api-pagination
+  bcrypt
   bootsnap (>= 1.4.2)
   config
   dotenv-rails

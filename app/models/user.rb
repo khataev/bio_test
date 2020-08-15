@@ -11,7 +11,8 @@ class User < ApplicationRecord
     {
       sub: {
         id: id,
-        name: name
+        name: name,
+        email: email
       }
     }
   end
