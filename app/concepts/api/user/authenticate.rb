@@ -11,7 +11,7 @@ module Api
         ctx[:user] = user_from_token(token)
         return false unless ctx[:user]
 
-        ctx[:user]
+        true
       end
 
       private

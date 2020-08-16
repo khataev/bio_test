@@ -8,7 +8,10 @@ module Grape
       def before
         return if authentication_disabled?
 
-        authenticate
+        user = authenticate
+
+        context.send(:instance_variable_set, '@current_user', user)
+        context.class.send(:define_method, 'current_user') { instance_variable_get '@current_user' }
       end
 
       private
@@ -25,6 +28,9 @@ module Grape
       def authenticate
         auth = Api::User::Authenticate.call(token: jwt_token)
         raise Errors::Unauthorized if auth.failure?
+
+        # TODO(khataev): :user -> :result
+        auth[:user]
       end
     end
   end

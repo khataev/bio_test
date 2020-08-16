@@ -17,6 +17,8 @@ RSpec.describe V1::Projects do
   end
   let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
 
+  include_context 'with action authorization turned off'
+
   describe '/api/v1/projects/:project_id' do
     let(:base_url) { "/api/v1/projects/#{project.id}" }
     let(:client) { create :client }
@@ -80,7 +82,6 @@ RSpec.describe V1::Projects do
           status: 'closed'
         )
       end
-
 
       context 'when authenticated' do
         include_context 'when authenticated'
@@ -226,24 +227,6 @@ RSpec.describe V1::Projects do
         it 'gets 401' do
           get base_url
           expect(last_response.status).to eq 401
-        end
-      end
-
-      context 'with resource authorization' do
-        let(:user1) { create :user }
-        let(:user2) { create :user }
-
-        include_context 'with authorization' do
-          let(:super_user) { user1 }
-          let(:user) { user2 }
-        end
-
-        before do
-          create_list :project, 2, client: client
-        end
-
-        it 'has access to all projects' do
-
         end
       end
     end
