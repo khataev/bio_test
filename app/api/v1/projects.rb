@@ -55,7 +55,7 @@ module V1
             action: 'show',
             embed: params['embed']
           )
-          raise Errors::Unauthorized if check_result.failure?
+          raise Errors::Unauthorized unless check_result[:result]
 
           present check_result[:result], with: Entities::Project, embed: params['embed']
         end
@@ -74,7 +74,7 @@ module V1
             resource: @project,
             action: 'update'
           )
-          raise Errors::Unauthorized if check_result.failure?
+          raise Errors::Unauthorized unless check_result[:result]
 
           project_params = declared(params, include_missing: false).except('project_id')
           @project.update!(project_params)
@@ -92,7 +92,7 @@ module V1
             resource: @project,
             action: 'delete'
           )
-          raise Errors::Unauthorized if check_result.failure?
+          raise Errors::Unauthorized unless check_result[:result]
 
           @project.destroy!
           status 200

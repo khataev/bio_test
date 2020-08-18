@@ -28,7 +28,15 @@ module V1
 
         desc 'Получить информацию о клиенте'
         get do
-          present @client, with: Entities::Client, embed: params['embed']
+          check_result = Resource::Authorize.call(
+            user: current_user,
+            resource: @client,
+            action: 'show',
+            embed: params['embed']
+          )
+          raise Errors::Unauthorized unless check_result[:result]
+
+          present check_result[:result], with: Entities::Client, embed: params['embed']
         end
       end
     end

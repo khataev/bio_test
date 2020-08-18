@@ -30,20 +30,36 @@ RSpec.describe V1::Projects do
       context 'when authenticated' do
         include_context 'when authenticated'
 
-
         context 'without embed' do
-          include_context 'with resource authorization permitted' do
-            let(:permitting_params) do
-              [
-                { user: user, resources: [project], action: 'show' }
-              ]
+          context 'when resource access is permitted' do
+            include_context 'with resource authorization permitted' do
+              let(:permitting_params) do
+                [
+                  { user: user, resources: [project], action: 'show' }
+                ]
+              end
+            end
+
+            it 'gets project' do
+              get base_url
+              expect(last_response.status).to eq 200
+              expect(parsed_body).to match expected_body
             end
           end
 
-          it 'gets project' do
-            get base_url
-            expect(last_response.status).to eq 200
-            expect(parsed_body).to match expected_body
+          context 'when resource access is forbidden' do
+            include_context 'with resource authorization forbidden' do
+              let(:forbidding_params) do
+                [
+                  { user: user, resources: [project], action: 'show' }
+                ]
+              end
+            end
+
+            it 'gets project' do
+              get base_url
+              expect(last_response.status).to eq 401
+            end
           end
         end
 

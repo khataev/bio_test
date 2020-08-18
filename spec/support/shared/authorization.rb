@@ -8,11 +8,18 @@ RSpec.shared_context 'with resource authorization permitted' do
   let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
   let(:permitted_requests) do
     permitting_params.map do |params|
+      all_resource_ids = params[:resources].map(&:id)
+      forbidden_resources = params[:forbidden_resources] || []
+      forbidden_resource_ids = forbidden_resources.map(&:id)
+      permitted_resource_ids = all_resource_ids - forbidden_resource_ids
       {
-        user_id: params[:user].id,
-        resource_class: params[:resources].first.class.name,
-        resource_ids: params[:resources].map(&:id),
-        action: params[:action]
+        request_body: {
+          user_id: params[:user].id,
+          resource_class: params[:resources].first.class.name,
+          resource_ids: all_resource_ids,
+          action: params[:action]
+        },
+        permitted_resource_ids: permitted_resource_ids
       }
     end
   end
@@ -21,10 +28,11 @@ RSpec.shared_context 'with resource authorization permitted' do
   end
 
   before do
-    permitted_requests.each do |body|
+    # TODO(khataev): improve naming
+    permitted_requests.each do |request|
       stub_request(:post, check_access_endpoint)
-        .with(body: body, headers: headers)
-        .to_return(body: body[:resource_ids].to_json, headers: headers)
+        .with(body: request[:request_body], headers: headers)
+        .to_return(body: request[:permitted_resource_ids].to_json, headers: headers)
     end
   end
 end
