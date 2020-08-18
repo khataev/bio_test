@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Resource
-  # TODO(khataev): Client to plural
   module Client
     class Create < Trailblazer::Operation
       # rubocop:disable Lint/UnreachableCode

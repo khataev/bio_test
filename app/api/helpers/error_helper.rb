@@ -6,34 +6,20 @@ module ErrorHelper
   def not_found(exception)
     error!(
       {
-        error: {
-          code: code(:not_found),
-          message: { "#{exception.model}": 'Не найден' }
-        }
+        errors: [{ "#{exception.model}": 'Не найден' }]
       }, code(:not_found)
     )
   end
 
   def unauthorized
     error!(
-      {
-        error: {
-          code: code(:unauthorized),
-          message: 'Unauthorized'
-        }
-      }, code(:unauthorized)
+      nil, code(:unauthorized)
     )
   end
 
   def unprocessable_entity_message(messages)
     error!(
-      {
-        error: {
-          # TODO(khataev): нах нам дублирование кода?
-          code: code(:unprocessable_entity),
-          data: messages
-        }
-      }, code(:unprocessable_entity)
+      { errors: messages }, code(:unprocessable_entity)
     )
   end
 

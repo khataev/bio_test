@@ -19,10 +19,35 @@ RSpec.describe V1::Clients do
     context 'when authenticated' do
       include_context 'when authenticated'
 
-      it 'gets client' do
-        get base_url
-        expect(last_response.status).to eq 200
-        expect(parsed_body[:name]).to eq client.name
+      context 'without embed' do
+        context 'when resource access is permitted' do
+          include_context 'with resource authorization permitted' do
+            let(:permitting_params) do
+              [
+                { user: user, resources: [client], action: 'show' }
+              ]
+            end
+          end
+          it 'gets client' do
+            get base_url
+            expect(last_response.status).to eq 200
+            expect(parsed_body[:name]).to eq client.name
+          end
+        end
+
+        context 'when resource access is forbidden' do
+          include_context 'with resource authorization forbidden' do
+            let(:forbidding_params) do
+              [
+                { user: user, resources: [client], action: 'show' }
+              ]
+            end
+          end
+          it 'gets client' do
+            get base_url
+            expect(last_response.status).to eq 401
+          end
+        end
       end
 
       context 'when embed' do
@@ -42,8 +67,13 @@ RSpec.describe V1::Clients do
           )
         end
 
-        before do
-          project
+        include_context 'with resource authorization permitted' do
+          let(:permitting_params) do
+            [
+              { user: user, resources: [project], action: 'show' },
+              { user: user, resources: [client], action: 'show' }
+            ]
+          end
         end
 
         it 'embeds projects' do
@@ -97,7 +127,7 @@ RSpec.describe V1::Clients do
           client.name = nil
           post base_url, client.as_json
           expect(last_response.status).to eq 422
-          expect(parsed_body.dig(:error, :data)).to eq expected_data
+          expect(parsed_body[:errors]).to eq expected_data
         end
       end
     end

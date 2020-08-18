@@ -12,7 +12,6 @@ module Resource
         ctx[:client_params] = params.delete(:client)
       end
 
-      # TODO(khataev): errors to result
       def create_client(ctx, params:, client_params:, **)
         client = ::Client.create(client_params)
         ctx[:params] = params.merge(client_id: client.id)

@@ -17,6 +17,8 @@ RSpec.describe V1::Projects do
   end
   let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
 
+  include_context 'with action authorization turned off'
+
   describe '/api/v1/projects/:project_id' do
     let(:base_url) { "/api/v1/projects/#{project.id}" }
     let(:client) { create :client }
@@ -28,10 +30,37 @@ RSpec.describe V1::Projects do
       context 'when authenticated' do
         include_context 'when authenticated'
 
-        it 'gets project' do
-          get base_url
-          expect(last_response.status).to eq 200
-          expect(parsed_body).to match expected_body
+        context 'without embed' do
+          context 'when resource access is permitted' do
+            include_context 'with resource authorization permitted' do
+              let(:permitting_params) do
+                [
+                  { user: user, resources: [project], action: 'show' }
+                ]
+              end
+            end
+
+            it 'gets project' do
+              get base_url
+              expect(last_response.status).to eq 200
+              expect(parsed_body).to match expected_body
+            end
+          end
+
+          context 'when resource access is forbidden' do
+            include_context 'with resource authorization forbidden' do
+              let(:forbidding_params) do
+                [
+                  { user: user, resources: [project], action: 'show' }
+                ]
+              end
+            end
+
+            it 'gets project' do
+              get base_url
+              expect(last_response.status).to eq 401
+            end
+          end
         end
 
         context 'when embed' do
@@ -46,6 +75,15 @@ RSpec.describe V1::Projects do
                 created_at: kind_of(String)
               )
             )
+          end
+
+          include_context 'with resource authorization permitted' do
+            let(:permitting_params) do
+              [
+                { user: user, resources: [project], action: 'show' },
+                { user: user, resources: [client], action: 'show' }
+              ]
+            end
           end
 
           it 'embeds client' do
@@ -81,9 +119,15 @@ RSpec.describe V1::Projects do
         )
       end
 
-
       context 'when authenticated' do
         include_context 'when authenticated'
+        include_context 'with resource authorization permitted' do
+          let(:permitting_params) do
+            [
+              { user: user, resources: [project], action: 'update' }
+            ]
+          end
+        end
 
         it 'updates project' do
           patch base_url, new_project_params
@@ -103,6 +147,13 @@ RSpec.describe V1::Projects do
     describe 'DELETE /api/v1/projects/:project_id' do
       context 'when authenticated' do
         include_context 'when authenticated'
+        include_context 'with resource authorization permitted' do
+          let(:permitting_params) do
+            [
+              { user: user, resources: [project], action: 'delete' }
+            ]
+          end
+        end
 
         it 'deletes project' do
           delete base_url
@@ -269,7 +320,7 @@ RSpec.describe V1::Projects do
             project.name = nil
             post base_url, project.as_json
             expect(last_response.status).to eq 422
-            expect(parsed_body.dig(:error, :data)).to eq expected_data
+            expect(parsed_body[:errors]).to eq expected_data
           end
         end
       end

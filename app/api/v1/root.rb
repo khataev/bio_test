@@ -6,6 +6,7 @@ module V1
     prefix :api
     format :json
 
+    mount V1::Token
     mount V1::Clients
     mount V1::Projects
   end
