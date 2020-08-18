@@ -26,7 +26,7 @@ module Grape
       end
 
       def authenticate
-        auth = Api::User::Authenticate.call(token: jwt_token)
+        auth = Api::Authenticate.call(token: jwt_token)
         raise Errors::Unauthorized if auth.failure?
 
         auth[:user]
