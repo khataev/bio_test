@@ -49,7 +49,7 @@ module V1
           ::Clients::Http::AuthorizeResource.new.check_action(
             user_id: current_user.id, resource_class: 'Project', action: 'show'
           )
-          check_result = Resource::Authorize.call(
+          check_result = Api::AuthorizeResource.call(
             user: current_user,
             resource: @project,
             action: 'show',
@@ -69,7 +69,7 @@ module V1
             user_id: current_user.id, resource_class: 'Project', action: 'update'
           )
 
-          check_result = Resource::Authorize.call(
+          check_result = Api::AuthorizeResource.call(
             user: current_user,
             resource: @project,
             action: 'update'
@@ -87,7 +87,7 @@ module V1
             user_id: current_user.id, resource_class: 'Project', action: 'show'
           )
 
-          check_result = Resource::Authorize.call(
+          check_result = Api::AuthorizeResource.call(
             user: current_user,
             resource: @project,
             action: 'delete'

@@ -28,7 +28,7 @@ module V1
 
         desc 'Получить информацию о клиенте'
         get do
-          check_result = Resource::Authorize.call(
+          check_result = Api::AuthorizeResource.call(
             user: current_user,
             resource: @client,
             action: 'show',

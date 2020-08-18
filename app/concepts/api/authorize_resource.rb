@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Resource
-  class Authorize < Trailblazer::Operation
+module Api
+  class AuthorizeResource < Trailblazer::Operation
     pass :authorize
     pass :authorize_embedded
     pass :assign_result
@@ -19,7 +19,7 @@ module Resource
     def authorize_embedded(ctx, user:, resource:, action:, **)
       return true unless ctx[:embedded_property]
 
-      result = Resource::Authorize.call(
+      result = Api::AuthorizeResource.call(
         user: user, resource: resource.send(ctx[:embedded_property]), action: action, embedded: true
       )
       ctx[:embedded_property_value] = result[:authorized_resource]

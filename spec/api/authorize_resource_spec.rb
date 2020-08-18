@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Resource::Authorize do
+RSpec.describe Api::AuthorizeResource do
   let(:user) { create :user }
   let(:client) { create :client }
   let(:project) { create :project, client: client }
