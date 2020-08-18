@@ -24,8 +24,8 @@ RSpec.describe Resource::Authorize do
       it 'returns project' do
         result = described_class.call(operation_params)
         expect(result).to be_success
-        expect(result[:result].as_json).to eq project.as_json
-        expect(result[:result]).to eq project
+        expect(result[:authorized_resource].as_json).to eq project.as_json
+        expect(result[:authorized_resource]).to eq project
       end
     end
 
@@ -40,8 +40,8 @@ RSpec.describe Resource::Authorize do
 
       it 'returns project' do
         result = described_class.call(operation_params)
-        expect(result).to be_failure
-        expect(result[:result]).to be_nil
+        expect(result).to be_success
+        expect(result[:authorized_resource]).to be_nil
       end
     end
 
@@ -56,14 +56,14 @@ RSpec.describe Resource::Authorize do
           end
         end
         let(:operation_params) do
-          { user: user, resource: project, action: 'show', embed: 'client' }
+          { user: user, resource: project, action: 'show', embedded_property: 'client' }
         end
 
         it 'returns project and client' do
           result = described_class.call(operation_params)
           expect(result).to be_success
-          expect(result[:result].id).to eq project.id
-          expect(result[:result].client).to be_present
+          expect(result[:authorized_resource].id).to eq project.id
+          expect(result[:authorized_resource].client).to be_present
         end
       end
 
@@ -83,14 +83,14 @@ RSpec.describe Resource::Authorize do
           end
         end
         let(:operation_params) do
-          { user: user, resource: project, action: 'show', embed: 'client' }
+          { user: user, resource: project, action: 'show', embedded_property: 'client' }
         end
 
         it 'returns project only' do
           result = described_class.call(operation_params)
           expect(result).to be_success
-          expect(result[:result].id).to eq project.id
-          expect(result[:result].client).to be_nil
+          expect(result[:authorized_resource].id).to eq project.id
+          expect(result[:authorized_resource].client).to be_nil
         end
       end
     end
@@ -117,14 +117,14 @@ RSpec.describe Resource::Authorize do
         end
 
         let(:operation_params) do
-          { user: user, resource: client, action: 'show', embed: 'projects' }
+          { user: user, resource: client, action: 'show', embedded_property: 'projects' }
         end
 
         it 'returns client and permitted project' do
           result = described_class.call(operation_params)
           expect(result).to be_success
-          expect(result[:result].id).to eq client.id
-          expect(result[:result].projects.map(&:id)).to eq [project.id]
+          expect(result[:authorized_resource].id).to eq client.id
+          expect(result[:authorized_resource].projects.map(&:id)).to eq [project.id]
         end
       end
     end

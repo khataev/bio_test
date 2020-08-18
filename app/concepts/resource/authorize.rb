@@ -16,32 +16,35 @@ module Resource
       )
     end
 
-    def authorize_embedded(ctx, user:, resource:, action:, embed: nil, **)
-      return true unless embed
+    def authorize_embedded(ctx, user:, resource:, action:, **)
+      return true unless ctx[:embedded_property]
 
       result = Resource::Authorize.call(
-        user: user, resource: resource.send(embed), action: action, embedded: true
+        user: user, resource: resource.send(ctx[:embedded_property]), action: action, embedded: true
       )
-      ctx[:embedded_value] = result[:result]
+      ctx[:embedded_property_value] = result[:authorized_resource]
     end
 
     def assign_result(ctx, **)
-      # TODO(khataev): result to authorized_resource?
-      ctx[:result] = result(**ctx)
+      ctx[:authorized_resource] = result(**ctx)
     end
 
     private
 
-    def result(resource:, authorized_ids:, embed: nil, embedded_value: nil, **)
-      authorized_resource = authorized_resource(resource, authorized_ids)
-      return authorized_resource unless embed
+    def result(resource:, authorized_ids:, embedded_property: nil, embedded_property_value: nil, **)
+      authorized_resource = filter_resource(resource, authorized_ids)
+      return authorized_resource unless embedded_property
 
-      Presenters::AuthorizedResource.new(authorized_resource, embed, embedded_value)
+      Presenters::AuthorizedResource.new(
+        authorized_resource,
+        embedded_property,
+        embedded_property_value
+      )
     end
 
-    def authorized_resource(resource, authorized_ids)
-      authorized_resources = Array.wrap(resource).select { |r| authorized_ids.include?(r.id) }
-      relation?(resource) ? authorized_resources : authorized_resources.first
+    def filter_resource(resource, authorized_ids)
+      filtered_resources = Array.wrap(resource).select { |r| authorized_ids.include?(r.id) }
+      relation?(resource) ? filtered_resources : filtered_resources.first
     end
 
     def resource_params(resource)

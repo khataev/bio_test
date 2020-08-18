@@ -53,11 +53,11 @@ module V1
             user: current_user,
             resource: @project,
             action: 'show',
-            embed: params['embed']
+            embedded_property: params['embed']
           )
-          raise Errors::Unauthorized unless check_result[:result]
+          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
-          present check_result[:result], with: Entities::Project, embed: params['embed']
+          present check_result[:authorized_resource], with: Entities::Project, embed: params['embed']
         end
 
         desc 'Обновить информацию о проекте'
@@ -74,7 +74,7 @@ module V1
             resource: @project,
             action: 'update'
           )
-          raise Errors::Unauthorized unless check_result[:result]
+          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
           project_params = declared(params, include_missing: false).except('project_id')
           @project.update!(project_params)
@@ -92,7 +92,7 @@ module V1
             resource: @project,
             action: 'delete'
           )
-          raise Errors::Unauthorized unless check_result[:result]
+          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
           @project.destroy!
           status 200

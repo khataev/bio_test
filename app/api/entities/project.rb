@@ -2,7 +2,6 @@
 
 module Entities
   class Project < Grape::Entity
-    # TODO(khataev): без документации?
     expose :id
     expose :client, with: Entities::Client, if: ->(_, options) { options[:embed] == 'client' }
     expose :client_id

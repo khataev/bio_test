@@ -6,14 +6,14 @@ RSpec.shared_context 'with resource authorization permitted' do
   # local variables
   let(:host) { Settings.hosts.authorize_resource }
   let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
-  let(:permitted_requests) do
+  let(:permitted_requests_params) do
     permitting_params.map do |params|
       all_resource_ids = params[:resources].map(&:id)
       forbidden_resources = params[:forbidden_resources] || []
       forbidden_resource_ids = forbidden_resources.map(&:id)
       permitted_resource_ids = all_resource_ids - forbidden_resource_ids
       {
-        request_body: {
+        body: {
           user_id: params[:user].id,
           resource_class: params[:resources].first.class.name,
           resource_ids: all_resource_ids,
@@ -28,10 +28,9 @@ RSpec.shared_context 'with resource authorization permitted' do
   end
 
   before do
-    # TODO(khataev): improve naming
-    permitted_requests.each do |request|
+    permitted_requests_params.each do |request|
       stub_request(:post, check_access_endpoint)
-        .with(body: request[:request_body], headers: headers)
+        .with(body: request[:body], headers: headers)
         .to_return(body: request[:permitted_resource_ids].to_json, headers: headers)
     end
   end
@@ -44,7 +43,7 @@ RSpec.shared_context 'with resource authorization forbidden' do
   let(:host) { Settings.hosts.authorize_resource }
   let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
   # HINT: names differ, but code is the same only to prevent interference in one example
-  let(:forbidden_requests) do
+  let(:forbidden_requests_params) do
     forbidding_params.map do |params|
       {
         user_id: params[:user].id,
@@ -59,7 +58,7 @@ RSpec.shared_context 'with resource authorization forbidden' do
   end
 
   before do
-    forbidden_requests.each do |body|
+    forbidden_requests_params.each do |body|
       stub_request(:post, check_access_endpoint)
         .with(body: body, headers: headers)
         .to_return(body: [].to_json, headers: headers)
@@ -73,8 +72,8 @@ RSpec.shared_context 'with action authorization turned off' do
   let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
 
   before do
-    # TODO(khataev): find more correct way
+    # HINT: seems to me query string could be ignored only like this
     stub_request(:get, check_action_endpoint).with(query: hash_including)
-    stub_request(:post, check_access_endpoint).with(body: hash_including)
+    stub_request(:post, check_access_endpoint)
   end
 end

@@ -32,11 +32,11 @@ module V1
             user: current_user,
             resource: @client,
             action: 'show',
-            embed: params['embed']
+            embedded_property: params['embed']
           )
-          raise Errors::Unauthorized unless check_result[:result]
+          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
-          present check_result[:result], with: Entities::Client, embed: params['embed']
+          present check_result[:authorized_resource], with: Entities::Client, embed: params['embed']
         end
       end
     end

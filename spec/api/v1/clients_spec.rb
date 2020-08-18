@@ -127,7 +127,7 @@ RSpec.describe V1::Clients do
           client.name = nil
           post base_url, client.as_json
           expect(last_response.status).to eq 422
-          expect(parsed_body.dig(:error, :data)).to eq expected_data
+          expect(parsed_body[:errors]).to eq expected_data
         end
       end
     end
