@@ -49,8 +49,15 @@ module V1
           ::Clients::Http::AuthorizeResource.new.check_action(
             user_id: current_user.id, resource_class: 'Project', action: 'show'
           )
+          check_result = Resource::Authorize.call(
+            user: current_user,
+            resource: @project,
+            action: 'show',
+            embed: params['embed']
+          )
+          raise Errors::Unauthorized if check_result.failure?
 
-          present @project, with: Entities::Project, embed: params['embed']
+          present check_result[:result], with: Entities::Project, embed: params['embed']
         end
 
         desc 'Обновить информацию о проекте'
@@ -62,6 +69,13 @@ module V1
             user_id: current_user.id, resource_class: 'Project', action: 'update'
           )
 
+          check_result = Resource::Authorize.call(
+            user: current_user,
+            resource: @project,
+            action: 'update'
+          )
+          raise Errors::Unauthorized if check_result.failure?
+
           project_params = declared(params, include_missing: false).except('project_id')
           @project.update!(project_params)
           present @project, with: Entities::Project
@@ -72,6 +86,13 @@ module V1
           ::Clients::Http::AuthorizeResource.new.check_action(
             user_id: current_user.id, resource_class: 'Project', action: 'show'
           )
+
+          check_result = Resource::Authorize.call(
+            user: current_user,
+            resource: @project,
+            action: 'delete'
+          )
+          raise Errors::Unauthorized if check_result.failure?
 
           @project.destroy!
           status 200

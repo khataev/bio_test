@@ -30,10 +30,21 @@ RSpec.describe V1::Projects do
       context 'when authenticated' do
         include_context 'when authenticated'
 
-        it 'gets project' do
-          get base_url
-          expect(last_response.status).to eq 200
-          expect(parsed_body).to match expected_body
+
+        context 'without embed' do
+          include_context 'with resource authorization permitted' do
+            let(:permitting_params) do
+              [
+                { user: user, resources: [project], action: 'show' }
+              ]
+            end
+          end
+
+          it 'gets project' do
+            get base_url
+            expect(last_response.status).to eq 200
+            expect(parsed_body).to match expected_body
+          end
         end
 
         context 'when embed' do
@@ -48,6 +59,15 @@ RSpec.describe V1::Projects do
                 created_at: kind_of(String)
               )
             )
+          end
+
+          include_context 'with resource authorization permitted' do
+            let(:permitting_params) do
+              [
+                { user: user, resources: [project], action: 'show' },
+                { user: user, resources: [client], action: 'show' }
+              ]
+            end
           end
 
           it 'embeds client' do
@@ -85,6 +105,13 @@ RSpec.describe V1::Projects do
 
       context 'when authenticated' do
         include_context 'when authenticated'
+        include_context 'with resource authorization permitted' do
+          let(:permitting_params) do
+            [
+              { user: user, resources: [project], action: 'update' }
+            ]
+          end
+        end
 
         it 'updates project' do
           patch base_url, new_project_params
@@ -104,6 +131,13 @@ RSpec.describe V1::Projects do
     describe 'DELETE /api/v1/projects/:project_id' do
       context 'when authenticated' do
         include_context 'when authenticated'
+        include_context 'with resource authorization permitted' do
+          let(:permitting_params) do
+            [
+              { user: user, resources: [project], action: 'delete' }
+            ]
+          end
+        end
 
         it 'deletes project' do
           delete base_url

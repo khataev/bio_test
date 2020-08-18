@@ -1,48 +1,61 @@
 # frozen_string_literal: true
 
-# TODO(khataev): remove?
-RSpec.shared_context 'with action authorization permitted' do
+RSpec.shared_context 'with resource authorization permitted' do
   # HINT: parameters
-  let(:authorized_user) {}
-  let(:authorized_resource_class) {}
-  let(:authorized_action) {}
+  let(:permitting_params) { [{ user: nil, resources: [], action: '' }] }
   # local variables
   let(:host) { Settings.hosts.authorize_resource }
-  let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
-  let(:authorized_user_query) do
-    {
-      user_id: authorized_user.id,
-      resource_class: authorized_resource_class,
-      action: authorized_action
-    }
+  let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
+  let(:permitted_requests) do
+    permitting_params.map do |params|
+      {
+        user_id: params[:user].id,
+        resource_class: params[:resources].first.class.name,
+        resource_ids: params[:resources].map(&:id),
+        action: params[:action]
+      }
+    end
+  end
+  let(:headers) do
+    { 'Content-Type': 'application/json' }
   end
 
   before do
-    stub_request(:get, check_action_endpoint).with(query: authorized_user_query)
+    permitted_requests.each do |body|
+      stub_request(:post, check_access_endpoint)
+        .with(body: body, headers: headers)
+        .to_return(body: body[:resource_ids].to_json, headers: headers)
+    end
   end
 end
 
-# TODO(khataev): remove?
-RSpec.shared_context 'with action authorization forbidden' do
+RSpec.shared_context 'with resource authorization forbidden' do
   # HINT: parameters
-  let(:unauthorized_user) {}
-  let(:unauthorized_resource_class) {}
-  let(:unauthorized_action) {}
+  let(:forbidding_params) { [{ user: nil, resources: [], action: '' }] }
   # local variables
   let(:host) { Settings.hosts.authorize_resource }
-  let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
-  let(:unauthorized_user_query) do
-    {
-      user_id: unauthorized_user.id,
-      resource_class: unauthorized_resource_class,
-      action: unauthorized_action
-    }
+  let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
+  # HINT: names differ, but code is the same only to prevent interference in one example
+  let(:forbidden_requests) do
+    forbidding_params.map do |params|
+      {
+        user_id: params[:user].id,
+        resource_class: params[:resources].first.class.name,
+        resource_ids: params[:resources].map(&:id),
+        action: params[:action]
+      }
+    end
+  end
+  let(:headers) do
+    { 'Content-Type': 'application/json' }
   end
 
   before do
-    stub_request(:get, check_action_endpoint)
-      .with(query: unauthorized_user_query)
-      .to_return(status: 401)
+    forbidden_requests.each do |body|
+      stub_request(:post, check_access_endpoint)
+        .with(body: body, headers: headers)
+        .to_return(body: [].to_json, headers: headers)
+    end
   end
 end
 

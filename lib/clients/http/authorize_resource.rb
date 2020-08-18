@@ -20,11 +20,11 @@ module Clients
       # user_id:, action:, resources: {}
       # available actions: show, update, delete
       # resource access example:
-      # { user_id: 1, action: 'show', resources: { project: [1, 2, 3], client: [6, 7, 8] } }
+      # { user_id: 1, action: 'show', resource_class: 'Project', resource_ids: [] }
       def check_access(**params)
-        request_params = { body: params }
+        request_params = { body: params.to_json, headers: { 'Content-Type': 'application/json' } }
         response = self.class.post('/api/v1/check_access', request_params)
-        raise Errors::Unauthorized unless response.success?
+        response.parsed_response
       end
     end
   end
