@@ -11,6 +11,8 @@ RSpec.describe V1::Clients do
 
   let(:parsed_body) { JSON.parse(last_response.body, symbolize_names: true) }
 
+  include_context 'with action authorization turned off'
+
   describe 'GET /api/v1/clients/:client_id' do
     let(:base_url) { "/api/v1/clients/#{client.id}" }
     let(:client) { create :client }

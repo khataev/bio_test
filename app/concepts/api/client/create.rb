@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Api
-  module Project
+  module Client
     class Create < Trailblazer::Operation
       step Subprocess(Api::AuthorizeAction), input: :authorize_input
-      step Subprocess(Resource::Project::Create)
+      step Subprocess(Resource::Client::Create)
       fail :failure
 
       def failure(ctx, **)
@@ -14,7 +14,7 @@ module Api
       private
 
       def authorize_input(_original_ctx, user:, **)
-        { user: user, resource_class: 'Project', action: 'create' }
+        { user: user, resource_class: 'Client', action: 'create' }
       end
     end
   end
