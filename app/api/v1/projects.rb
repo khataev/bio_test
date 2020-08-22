@@ -11,11 +11,10 @@ module V1
       end
       paginate
       get do
-        ::Clients::Http::AuthorizeResource.new.check_action(
-          user_id: current_user.id, resource_class: 'Project', action: 'index'
+        result = Api::Project::Index.call(
+          params: declared(params),
+          user: current_user
         )
-
-        result = Resource::Project::Query::Search.call(params: declared(params))
         present paginate(result[:scope]), with: Entities::Project
       end
 
