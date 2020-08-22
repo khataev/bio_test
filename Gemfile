@@ -28,6 +28,10 @@ gem 'dotenv-rails', require: 'dotenv/rails-now'
 gem 'httparty'
 gem 'trailblazer-rails'
 
+gem 'reform'
+gem 'reform-rails'
+# gem 'dry-validation'
+
 # API
 gem 'grape'
 gem 'grape-entity'

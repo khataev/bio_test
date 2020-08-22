@@ -314,13 +314,21 @@ RSpec.describe V1::Projects do
         end
 
         context 'when error' do
-          let(:expected_data) { ["Name can't be blank"] }
+          let(:expected_name_error) { { name: ["can't be blank"] } }
+          let(:expected_client_id_error) { { client_id: ["can't be blank"] } }
 
           it 'return error' do
             project.name = nil
             post base_url, project.as_json
             expect(last_response.status).to eq 422
-            expect(parsed_body[:errors]).to eq expected_data
+            expect(parsed_body[:errors]).to eq expected_name_error
+          end
+
+          it 'returns error if client_id neither client present' do
+            project.client_id = nil
+            post base_url, project.as_json
+            expect(last_response.status).to eq 422
+            expect(parsed_body[:errors]).to eq expected_client_id_error
           end
         end
       end

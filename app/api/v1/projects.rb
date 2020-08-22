@@ -31,11 +31,10 @@ module V1
         result = Resource::Project::Create.call(
           params: declared(params, include_missing: false)
         )
-
         if result.success?
-          present result[:result], with: Entities::Project
+          present result[:model], with: Entities::Project
         else
-          unprocessable_entity_message(result[:result])
+          unprocessable_entity_message(result[:'contract.default'].errors.messages)
         end
       end
 

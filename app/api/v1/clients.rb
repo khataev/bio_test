@@ -15,9 +15,9 @@ module V1
         )
 
         if result.success?
-          present result[:result], with: Entities::Client
+          present result[:model], with: Entities::Client
         else
-          unprocessable_entity_message(result[:result])
+          unprocessable_entity_message(result[:'contract.default'].errors.messages)
         end
       end
 

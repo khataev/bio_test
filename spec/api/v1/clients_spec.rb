@@ -121,7 +121,7 @@ RSpec.describe V1::Clients do
       end
 
       context 'when error' do
-        let(:expected_data) { ["Name can't be blank"] }
+        let(:expected_data) { { name: ["can't be blank"] } }
 
         it 'return error' do
           client.name = nil
