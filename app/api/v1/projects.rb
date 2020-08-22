@@ -24,17 +24,14 @@ module V1
         use :create_project_params
       end
       post do
-        ::Clients::Http::AuthorizeResource.new.check_action(
-          user_id: current_user.id, resource_class: 'Project', action: 'create'
-        )
-
-        result = Resource::Project::Create.call(
-          params: declared(params, include_missing: false)
+        result = Api::Project::Create.call(
+          params: declared(params, include_missing: false),
+          user: current_user
         )
         if result.success?
           present result[:model], with: Entities::Project
         else
-          unprocessable_entity_message(result[:'contract.default'].errors.messages)
+          unprocessable_entity_message(result[:errors])
         end
       end
 
