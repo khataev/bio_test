@@ -2,7 +2,7 @@
 
 module V1
   class Projects < Grape::API
-    helpers ParamsHelper
+    helpers ParamsHelper, OperationResultHelper
 
     resources :projects do
       desc 'Получить список проектов'
@@ -28,11 +28,7 @@ module V1
           params: declared(params, include_missing: false),
           user: current_user
         )
-        if result.success?
-          present result[:model], with: Entities::Project
-        else
-          unprocessable_entity_message(result[:errors])
-        end
+        present_result(result)
       end
 
       route_param :project_id, type: String do
@@ -48,12 +44,7 @@ module V1
             embedded_property: params['embed']
           )
 
-          if result.success?
-            present result[:model], with: Entities::Project, embed: params['embed']
-          else
-            unprocessable_entity_message(result[:errors])
-          end
-          # present check_result[:authorized_resource], with: Entities::Project, embed: params['embed']
+          present_result(result, embed: params['embed'])
         end
 
         desc 'Обновить информацию о проекте'
@@ -64,16 +55,10 @@ module V1
           # TODO(khataev): we could pass id to operation
           result = Api::Project::Update.trace(
             model: @project,
-            # TODO(khataev): do we need except?
-            params: declared(params, include_missing: false).except('project_id'),
+            params: declared(params, include_missing: false),
             user: current_user
           )
-          # TODO(khataev): to common place
-          if result.success?
-            present result[:model], with: Entities::Project
-          else
-            unprocessable_entity_message(result[:errors])
-          end
+          present_result(result)
         end
 
         desc 'Удалить проект'
@@ -83,12 +68,7 @@ module V1
             model: @project,
             user: current_user
           )
-
-          if result.success?
-            present result[:model], with: Entities::Project
-          else
-            unprocessable_entity_message(result[:errors])
-          end
+          present_result(result)
         end
       end
     end

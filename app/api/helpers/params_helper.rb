@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO(khataev): revise
 module ParamsHelper
   extend Grape::API::Helpers
 
