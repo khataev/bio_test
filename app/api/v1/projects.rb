@@ -27,7 +27,7 @@ module V1
           params: declared(params, include_missing: false),
           user: current_user
         )
-        present_result(result)
+        present_result(result, Entities::Project)
       end
 
       route_param :id, type: String do
@@ -39,7 +39,7 @@ module V1
             embedded_property: params['embed']
           )
 
-          present_result(result, embed: params['embed'])
+          present_result(result, Entities::Project, embed: params['embed'])
         end
 
         desc 'Обновить информацию о проекте'
@@ -51,7 +51,7 @@ module V1
             params: declared(params, include_missing: false),
             user: current_user
           )
-          present_result(result)
+          present_result(result, Entities::Project)
         end
 
         desc 'Удалить проект'
@@ -60,7 +60,7 @@ module V1
             params: { id: params[:id] },
             user: current_user
           )
-          present_result(result)
+          present_result(result, Entities::Project)
         end
       end
     end

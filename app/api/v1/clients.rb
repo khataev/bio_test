@@ -2,7 +2,7 @@
 
 module V1
   class Clients < Grape::API
-    helpers ParamsHelper, CookiesHelper
+    helpers ParamsHelper, CookiesHelper, OperationResultHelper
 
     resources :clients do
       desc 'Создать клиента'
@@ -14,29 +14,19 @@ module V1
           params: declared(params, include_missing: false),
           user: current_user
         )
-        if result.success?
-          present result[:model], with: Entities::Client
-        else
-          unprocessable_entity_message(result[:errors])
-        end
+        present_result(result, Entities::Client)
       end
 
-      route_param :client_id, type: String do
-        before do
-          @client = ::Client.find(params[:client_id])
-        end
-
+      route_param :id, type: String do
         desc 'Получить информацию о клиенте'
         get do
-          check_result = Api::AuthorizeResource.call(
+          result = Api::Client::Show.call(
+            params: { id: params[:id] },
             user: current_user,
-            resource: @client,
-            action: 'show',
             embedded_property: params['embed']
           )
-          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
-          present check_result[:authorized_resource], with: Entities::Client, embed: params['embed']
+          present_result(result, Entities::Client, embed: params['embed'])
         end
       end
     end
