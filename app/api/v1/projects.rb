@@ -64,6 +64,7 @@ module V1
           # TODO(khataev): we could pass id to operation
           result = Api::Project::Update.trace(
             model: @project,
+            # TODO(khataev): do we need except?
             params: declared(params, include_missing: false).except('project_id'),
             user: current_user
           )
@@ -77,19 +78,18 @@ module V1
 
         desc 'Удалить проект'
         delete do
-          ::Clients::Http::AuthorizeResource.new.check_action(
-            user_id: current_user.id, resource_class: 'Project', action: 'show'
+          # TODO(khataev): we could pass id to operation
+          result = Api::Project::Delete.call(
+            model: @project,
+            params: declared(params, include_missing: false).except('project_id'),
+            user: current_user
           )
 
-          check_result = Api::AuthorizeResource.call(
-            user: current_user,
-            resource: @project,
-            action: 'delete'
-          )
-          raise Errors::Unauthorized unless check_result[:authorized_resource]
-
-          @project.destroy!
-          status 200
+          if result.success?
+            present result[:model], with: Entities::Project
+          else
+            unprocessable_entity_message(result[:errors])
+          end
         end
       end
     end
