@@ -61,20 +61,18 @@ module V1
           use :update_project_params
         end
         patch do
-          ::Clients::Http::AuthorizeResource.new.check_action(
-            user_id: current_user.id, resource_class: 'Project', action: 'update'
+          # TODO(khataev): we could pass id to operation
+          result = Api::Project::Update.trace(
+            model: @project,
+            params: declared(params, include_missing: false).except('project_id'),
+            user: current_user
           )
-
-          check_result = Api::AuthorizeResource.call(
-            user: current_user,
-            resource: @project,
-            action: 'update'
-          )
-          raise Errors::Unauthorized unless check_result[:authorized_resource]
-
-          project_params = declared(params, include_missing: false).except('project_id')
-          @project.update!(project_params)
-          present @project, with: Entities::Project
+          # TODO(khataev): to common place
+          if result.success?
+            present result[:model], with: Entities::Project
+          else
+            unprocessable_entity_message(result[:errors])
+          end
         end
 
         desc 'Удалить проект'
