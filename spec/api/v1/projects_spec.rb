@@ -19,7 +19,7 @@ RSpec.describe V1::Projects do
 
   include_context 'with action authorization turned off'
 
-  describe '/api/v1/projects/:project_id' do
+  describe '/api/v1/projects/:id' do
     let(:base_url) { "/api/v1/projects/#{project.id}" }
     let(:client) { create :client }
     let(:project) { create :project, client: client }

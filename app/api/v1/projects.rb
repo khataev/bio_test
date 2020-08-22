@@ -30,15 +30,11 @@ module V1
         present_result(result)
       end
 
-      route_param :project_id, type: String do
-        before do
-          @project = ::Project.find(params[:project_id])
-        end
-
+      route_param :id, type: String do
         desc 'Получить информацию о проекте'
         get do
           result = Api::Project::Show.call(
-            model: @project,
+            params: { id: params[:id] },
             user: current_user,
             embedded_property: params['embed']
           )
@@ -51,9 +47,7 @@ module V1
           use :update_project_params
         end
         patch do
-          # TODO(khataev): we could pass id to operation
           result = Api::Project::Update.trace(
-            model: @project,
             params: declared(params, include_missing: false),
             user: current_user
           )
@@ -62,9 +56,8 @@ module V1
 
         desc 'Удалить проект'
         delete do
-          # TODO(khataev): we could pass id to operation
           result = Api::Project::Delete.call(
-            model: @project,
+            params: { id: params[:id] },
             user: current_user
           )
           present_result(result)

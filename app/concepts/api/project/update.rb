@@ -3,7 +3,7 @@
 module Api
   module Project
     class Update < Trailblazer::Operation
-      # step Model(::Project, :find_by)
+      step Model(::Project, :find_by)
       step Subprocess(Api::AuthorizeAction), input: :authorize_action_input
       step Subprocess(Api::AuthorizeResource), input: :authorize_resource_input
       pass :check_authorization_result
