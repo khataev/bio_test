@@ -42,18 +42,18 @@ module V1
 
         desc 'Получить информацию о проекте'
         get do
-          ::Clients::Http::AuthorizeResource.new.check_action(
-            user_id: current_user.id, resource_class: 'Project', action: 'show'
-          )
-          check_result = Api::AuthorizeResource.call(
+          result = Api::Project::Show.call(
+            model: @project,
             user: current_user,
-            resource: @project,
-            action: 'show',
             embedded_property: params['embed']
           )
-          raise Errors::Unauthorized unless check_result[:authorized_resource]
 
-          present check_result[:authorized_resource], with: Entities::Project, embed: params['embed']
+          if result.success?
+            present result[:model], with: Entities::Project, embed: params['embed']
+          else
+            unprocessable_entity_message(result[:errors])
+          end
+          # present check_result[:authorized_resource], with: Entities::Project, embed: params['embed']
         end
 
         desc 'Обновить информацию о проекте'
@@ -81,7 +81,6 @@ module V1
           # TODO(khataev): we could pass id to operation
           result = Api::Project::Delete.call(
             model: @project,
-            params: declared(params, include_missing: false).except('project_id'),
             user: current_user
           )
 
