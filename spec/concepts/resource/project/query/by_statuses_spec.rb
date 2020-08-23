@@ -25,6 +25,6 @@ RSpec.describe Resource::Project::Query::ByStatuses do
   it 'validates statuses' do
     result = call_with_wrong_status!
     expect(result).to be_failure
-    expect(result[:'contract.default'].errors.messages.key?(:base)).to be true
+    expect(result[:'contract.default'].errors.messages.key?(:statuses)).to be true
   end
 end

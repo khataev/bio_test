@@ -4,7 +4,8 @@ module Resource
   module Project
     module Query
       class ByCreatedAt < Trailblazer::Operation
-        Parameters = Struct.new(:created_at_from, :created_at_to, keyword_init: true)
+        PARAMETERS = %i[created_at_from created_at_to].freeze
+        ModelObject = Struct.new(*PARAMETERS, keyword_init: true)
 
         step :init
         step Contract::Build(constant: Resource::Project::Query::Contracts::ByCreatedAt)
@@ -12,7 +13,7 @@ module Resource
         step :search
 
         def init(ctx, params:, scope: ::Project.all, **)
-          ctx[:model] = Parameters.new(params)
+          ctx[:model] = ModelObject.new(params.slice(*PARAMETERS))
           ctx[:scope] = scope
         end
 

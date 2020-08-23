@@ -4,13 +4,16 @@ module Resource
   module Project
     module Query
       class ByStatuses < Trailblazer::Operation
+        PARAMETERS = %i[statuses].freeze
+        ModelObject = Struct.new(*PARAMETERS, keyword_init: true)
+
         step :init
         step Contract::Build(constant: Resource::Project::Query::Contracts::ByStatuses)
         step Contract::Validate()
         step :search
 
         def init(ctx, params:, scope: ::Project.all, **)
-          ctx[:model] = params[:statuses] || []
+          ctx[:model] = ModelObject.new(params.slice(*PARAMETERS))
           ctx[:scope] = scope
         end
 

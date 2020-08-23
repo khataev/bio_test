@@ -13,12 +13,16 @@ module Resource
           private
 
           def correct_created_at_from
+            return unless created_at_from
+
             DateTime.parse(created_at_from)
           rescue StandardError
             errors.add(:created_at_from, :wrong_datetime, value: created_at_from)
           end
 
           def correct_created_at_to
+            return unless created_at_to
+
             DateTime.parse(created_at_to)
           rescue StandardError
             errors.add(:created_at_to, :wrong_datetime, value: created_at_to)

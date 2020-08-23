@@ -5,15 +5,19 @@ module Resource
     module Query
       module Contracts
         class ByStatuses < Reform::Form
+          property :statuses
+
           validate :correct_statuses
 
           private
 
           def correct_statuses
-            wrong_statuses = model.select { |status| ::Project.statuses.keys.exclude?(status) }
+            return unless statuses
+
+            wrong_statuses = statuses.select { |status| ::Project.statuses.keys.exclude?(status) }
             return if wrong_statuses.blank?
 
-            errors.add(:base, :wrong_statuses, statuses: wrong_statuses)
+            errors.add(:statuses, :wrong, statuses: wrong_statuses)
           end
         end
       end

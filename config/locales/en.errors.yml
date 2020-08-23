@@ -4,8 +4,8 @@ en:
       models:
         resource/project/query/contracts/by_statuses:
           attributes:
-            base:
-              wrong_statuses: 'Wrong statuses: %{statuses}'
+            statuses:
+              wrong: 'Wrong statuses: %{statuses}'
         resource/project/query/contracts/by_created_at:
           attributes:
             created_at_from:
