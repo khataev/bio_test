@@ -14,6 +14,7 @@ module Clients
       def check_action(**params)
         request_params = { query: params }
         response = self.class.get('/api/v1/check_action', request_params)
+        # TODO(khataev): remove raise
         raise Errors::Unauthorized unless response.success?
       end
 

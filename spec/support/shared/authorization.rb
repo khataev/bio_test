@@ -69,11 +69,51 @@ end
 RSpec.shared_context 'with action authorization turned off' do
   let(:host) { Settings.hosts.authorize_resource }
   let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
+  # TODO(khataev): remove?
   let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
 
   before do
     # HINT: seems to me query string could be ignored only like this
     stub_request(:get, check_action_endpoint).with(query: hash_including)
     stub_request(:post, check_access_endpoint)
+  end
+end
+
+RSpec.shared_context 'with action authorization permitted' do
+  let(:host) { Settings.hosts.authorize_resource }
+  let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
+  let(:permitted_user) {}
+  let(:permitted_resource_class) {}
+  let(:permitted_action) {}
+
+  before do
+    stub_request(:get, check_action_endpoint)
+      .with(
+        query: {
+          user_id: permitted_user.id,
+          resource_class: permitted_resource_class,
+          action: permitted_action
+        }
+      )
+  end
+end
+
+RSpec.shared_context 'with action authorization forbidden' do
+  let(:host) { Settings.hosts.authorize_resource }
+  let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
+  let(:forbidden_user) {}
+  let(:forbidden_resource_class) {}
+  let(:forbidden_action) {}
+
+  before do
+    stub_request(:get, check_action_endpoint)
+      .with(
+        query: {
+          user_id: forbidden_user.id,
+          resource_class: forbidden_resource_class,
+          action: forbidden_action
+        }
+      )
+      .to_return(status: 401)
   end
 end
