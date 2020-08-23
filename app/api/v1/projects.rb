@@ -15,7 +15,7 @@ module V1
           params: declared(params),
           user: current_user
         )
-        present paginate(result[:scope]), with: Entities::Project
+        present_paginated_result result, Entities::Project
       end
 
       desc 'Создать проект'

@@ -11,8 +11,12 @@ module Resource
           ctx[:scope] = scope
         end
 
-        def search(ctx, scope:, created_at_from: nil, created_at_to: nil, **)
-          ctx[:result] = search_by_created_at(scope, created_at_from, created_at_to)
+        def search(ctx, scope:, params:, **)
+          ctx[:scope] = search_by_created_at(
+            scope,
+            params[:created_at_from],
+            params[:created_at_to]
+          )
         end
 
         private

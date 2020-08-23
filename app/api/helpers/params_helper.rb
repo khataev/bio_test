@@ -38,8 +38,8 @@ module ParamsHelper
 
   params :search_params do
     optional :name_cont, type: String, desc: 'Substring to search in name'
-    optional :client_ids, type: Array, coerce_with: JSON, desc: 'Filter by client ids'
-    optional :statuses, type: Array, coerce_with: JSON, desc: 'Filter by project status'
+    optional :client_ids, type: Array[String], desc: 'Filter by client ids'
+    optional :statuses, type: Array[String], desc: 'Filter by project status'
     optional :created_at_from, type: String, desc: 'Created at left boundary'
     optional :created_at_to, type: String, desc: 'Created at right boundary'
   end

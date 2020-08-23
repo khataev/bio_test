@@ -62,6 +62,7 @@ group :development do
 end
 
 group :test do
+  # TODO(khataev): remove
   gem 'addressable'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'webmock'

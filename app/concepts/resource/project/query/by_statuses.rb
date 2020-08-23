@@ -5,14 +5,17 @@ module Resource
     module Query
       class ByStatuses < Trailblazer::Operation
         step :init
+        step Contract::Build(constant: Resource::Project::Query::Contracts::ByStatuses)
+        step Contract::Validate()
         step :search
 
-        def init(ctx, scope: ::Project.all, **)
+        def init(ctx, params:, scope: ::Project.all, **)
+          ctx[:model] = params[:statuses] || []
           ctx[:scope] = scope
         end
 
-        def search(ctx, scope:, statuses: nil, **)
-          ctx[:result] = search_by_statuses(scope, statuses)
+        def search(ctx, scope:, params:, **)
+          ctx[:scope] = search_by_statuses(scope, params[:statuses])
         end
 
         private

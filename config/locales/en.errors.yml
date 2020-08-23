@@ -1,0 +1,8 @@
+en:
+  activemodel:
+    errors:
+      models:
+        resource/project/query/contracts/by_statuses:
+          attributes:
+            base:
+              wrong_statuses: 'Wrong statuses: %{statuses}'

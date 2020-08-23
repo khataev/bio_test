@@ -7,7 +7,7 @@ RSpec.describe Resource::Project::Query::ByName do
   let(:project1) { create :project, client: client1, name: 'QwertY' }
   let(:project2) { create :project, client: client1, name: 'WertyU' }
   let(:project3) { create :project, client: client1, name: 'ErtyuI' }
-  let(:call!) { described_class.call(name_cont: 'tyu') }
+  let(:call!) { described_class.call(params: { name_cont: 'tyu' }) }
 
   before do
     project1
@@ -18,6 +18,6 @@ RSpec.describe Resource::Project::Query::ByName do
   it 'filters by client_ids' do
     result = call!
     expect(result).to be_success
-    expect(result[:result].map(&:id)).to eq [project2.id, project3.id]
+    expect(result[:scope].map(&:id)).to eq [project2.id, project3.id]
   end
 end

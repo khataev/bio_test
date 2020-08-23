@@ -243,7 +243,7 @@ RSpec.describe V1::Projects do
             }
           end
           let(:url) do
-            Addressable::Template.new("#{base_url}/{?query*}").expand(query).to_s
+            "#{base_url}?#{query[:query].to_query}"
           end
           let(:expected_result) do
             [

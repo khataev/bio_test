@@ -12,4 +12,12 @@ module OperationResultHelper
       unprocessable_entity_message(result[:errors])
     end
   end
+
+  def present_paginated_result(result, entity)
+    if result.success?
+      present paginate(result[:scope]), with: entity
+    else
+      unprocessable_entity_message(result[:errors])
+    end
+  end
 end

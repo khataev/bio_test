@@ -11,8 +11,8 @@ module Resource
           ctx[:scope] = scope
         end
 
-        def search(ctx, scope:, name_cont: nil, **)
-          ctx[:result] = search_by_name(scope, name_cont)
+        def search(ctx, scope:, params:, **)
+          ctx[:scope] = search_by_name(scope, params[:name_cont])
         end
 
         private

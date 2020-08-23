@@ -11,8 +11,8 @@ module Resource
           ctx[:scope] = scope
         end
 
-        def search(ctx, scope:, client_ids: nil, **)
-          ctx[:result] = search_by_client_ids(scope, client_ids)
+        def search(ctx, scope:, params:, **)
+          ctx[:scope] = search_by_client_ids(scope, params[:client_ids])
         end
 
         private
