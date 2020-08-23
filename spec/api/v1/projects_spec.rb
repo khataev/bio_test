@@ -25,8 +25,6 @@ RSpec.describe V1::Projects do
     let(:project) { create :project, client: client }
 
     describe 'GET /api/v1/projects/:project_id' do
-      let(:created_project) { Project.first }
-
       context 'when authenticated' do
         include_context 'when authenticated'
 

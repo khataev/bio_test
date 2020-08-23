@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Returns :authorized_resource when success, otherwise returns failure
+# For collections always successful and return filtered elements
 module Api
   class AuthorizeResource < Trailblazer::Operation
     pass :authorize
@@ -8,7 +10,7 @@ module Api
     pass Subprocess(Api::AuthorizeResource),
          input: :authorize_embedded_resource_input,
          output: { authorized_resource: :embedded_property_value }
-    pass :assign_result
+    step :assign_result
 
     def authorize(ctx, user:, resource:, action:, **)
       resource_class, resource_ids = resource_params(resource)

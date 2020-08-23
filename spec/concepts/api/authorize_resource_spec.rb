@@ -40,7 +40,7 @@ RSpec.describe Api::AuthorizeResource do
 
       it 'returns project' do
         result = described_class.call(operation_params)
-        expect(result).to be_success
+        expect(result).to be_failure
         expect(result[:authorized_resource]).to be_nil
       end
     end

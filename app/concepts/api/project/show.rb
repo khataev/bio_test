@@ -6,17 +6,10 @@ module Api
       step Model(::Project, :find_by)
       step Subprocess(Api::AuthorizeAction), input: :authorize_action_input
       step Subprocess(Api::AuthorizeResource), input: :authorize_resource_input
-      pass :check_authorization_result
-      # step Subprocess(Resource::Project::Show)
-      fail :failure
+      fail :authorize_resource_failure
 
-      def failure(ctx, **)
-        ctx[:errors] = ctx[:'contract.default'].errors.messages
-      end
-
-      def check_authorization_result(_ctx, authorized_resource:, **)
-        # TODO(khataev): think how to handle this more concise
-        raise Errors::Unauthorized unless authorized_resource
+      def authorize_resource_failure(ctx, **)
+        ctx[:unauthorized] = true
       end
 
       private

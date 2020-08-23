@@ -2,7 +2,7 @@
 
 module Api
   class AuthorizeAction < Trailblazer::Operation
-    pass :authorize
+    step :authorize
 
     def authorize(_ctx, user:, resource_class:, action:, **)
       ::Clients::Http::AuthorizeResource.new.check_action(

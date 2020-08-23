@@ -31,8 +31,8 @@ RSpec.describe Api::AuthorizeAction do
     end
 
     it do
-      # TODO(khataev): change this behaviour
-      expect { described_class.call(operation_params) }.to raise_error Errors::Unauthorized
+      result = described_class.call(operation_params)
+      expect(result).to be_failure
     end
   end
 end
