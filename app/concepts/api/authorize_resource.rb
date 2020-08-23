@@ -3,7 +3,11 @@
 module Api
   class AuthorizeResource < Trailblazer::Operation
     pass :authorize
-    pass :authorize_embedded
+    step :embedded_property?,
+         Output(:failure) => Id(:assign_result)
+    pass Subprocess(Api::AuthorizeResource),
+         input: :authorize_embedded_resource_input,
+         output: { authorized_resource: :embedded_property_value }
     pass :assign_result
 
     def authorize(ctx, user:, resource:, action:, **)
@@ -16,13 +20,12 @@ module Api
       )
     end
 
-    def authorize_embedded(ctx, user:, resource:, action:, **)
-      return true unless ctx[:embedded_property]
+    def embedded_property?(_ctx, embedded_property: nil, **)
+      embedded_property
+    end
 
-      result = Api::AuthorizeResource.call(
-        user: user, resource: resource.send(ctx[:embedded_property]), action: action, embedded: true
-      )
-      ctx[:embedded_property_value] = result[:authorized_resource]
+    def authorize_embedded_resource_input(_original_ctx, resource:, embedded_property:, **options)
+      { resource: resource.send(embedded_property), **options }
     end
 
     def assign_result(ctx, **)
