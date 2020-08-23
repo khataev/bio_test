@@ -69,13 +69,10 @@ end
 RSpec.shared_context 'with action authorization turned off' do
   let(:host) { Settings.hosts.authorize_resource }
   let(:check_action_endpoint) { "#{host}/api/v1/check_action" }
-  # TODO(khataev): remove?
-  let(:check_access_endpoint) { "#{host}/api/v1/check_access" }
 
   before do
     # HINT: seems to me query string could be ignored only like this
     stub_request(:get, check_action_endpoint).with(query: hash_including)
-    stub_request(:post, check_access_endpoint)
   end
 end
 
