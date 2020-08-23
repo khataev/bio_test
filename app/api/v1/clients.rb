@@ -2,7 +2,7 @@
 
 module V1
   class Clients < Grape::API
-    helpers ParamsHelper, CookiesHelper, OperationResultHelper
+    helpers ParamsHelper, OperationResultHelper
 
     resources :clients do
       desc 'Создать клиента'

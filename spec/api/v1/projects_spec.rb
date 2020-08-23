@@ -237,8 +237,8 @@ RSpec.describe V1::Projects do
             {
               query: {
                 name_cont: 'rty',
-                client_ids: [client1.id],
-                statuses: %i[in_progress closed],
+                client_ids: [client1.id, client1.id],
+                statuses: %w[in_progress closed],
                 created_at_from: from.iso8601,
                 created_at_to: to.iso8601
               }
