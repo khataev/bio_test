@@ -6,3 +6,9 @@ en:
           attributes:
             base:
               wrong_statuses: 'Wrong statuses: %{statuses}'
+        resource/project/query/contracts/by_created_at:
+          attributes:
+            created_at_from:
+              wrong_datetime: 'Wrong datetime in created_at_from: %{value}'
+            created_at_to:
+              wrong_datetime: 'Wrong datetime in created_at_to: %{value}'
